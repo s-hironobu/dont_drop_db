@@ -1,0 +1,5 @@
+# dont_drop_db extension
+comment = 'dont_drop_db prohibits to drop the databases listed in the dont_drop_db.list parameter.'
+default_version = '1.0'
+module_pathname = '$libdir/dont_drop_db'
+relocatable = true
