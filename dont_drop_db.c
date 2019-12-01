@@ -39,7 +39,7 @@ static bool	check_drop_database(PlannedStmt *pstmt);
 static char *ddd_list;
 
 /* Const. */
-#define MAX_DATABASE_NAME_LENGTH 64
+#define MAX_DATABASE_NAME_LENGTH 63
 
 /* Module callback */
 void
@@ -77,7 +77,7 @@ _PG_fini(void)
 static bool
 check_drop_database_statement(DropdbStmt *dstmt)
 {
-	char buff[MAX_DATABASE_NAME_LENGTH];
+	char buff[MAX_DATABASE_NAME_LENGTH + 1];
 	int i, j;
 	char c;
 
@@ -93,7 +93,7 @@ check_drop_database_statement(DropdbStmt *dstmt)
 			|| c == '\f' || c == '\r')
 			continue;
 
-		if (c == ',')
+		if (c == ',' && j <= MAX_DATABASE_NAME_LENGTH)
 		{
 			buff[j] = '\0';
 			if (pg_strcasecmp(dstmt->dbname, buff) == 0 
@@ -102,9 +102,23 @@ check_drop_database_statement(DropdbStmt *dstmt)
 			else
 				j = 0;
 		}
-		else
+		else if (j <= MAX_DATABASE_NAME_LENGTH)
+		{
 			buff[j++] = c;
+		}
+		else
+		{
+			/* Skip to the next entry because this dbname is invalid (too long). */
+			j = 0;
+			buff[0] = '\0';
+			while (c != ',' && c != '\0' /* Skip to ',' or '\0'. */
+				   && (i < strlen(ddd_list) - 1))
+				c = ddd_list[++i];
+		}
 	}
+
+	if (MAX_DATABASE_NAME_LENGTH < j)
+		return false;
 
 	buff[j] = '\0';
 	if (strlen(buff) > 0)
