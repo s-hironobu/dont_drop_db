@@ -9,10 +9,6 @@
  *-------------------------------------------------------------------------
  */
 #include "postgres.h"
-#if PG_VERSION_NUM >= 120000
-#include "access/table.h"
-#include "access/genam.h"
-#endif
 #include "miscadmin.h"
 #include "tcop/utility.h"
 #include "port.h"
