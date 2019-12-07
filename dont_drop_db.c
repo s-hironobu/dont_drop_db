@@ -13,6 +13,7 @@
 #include "tcop/utility.h"
 #include "port.h"
 #include "string.h"
+#include "pg_config_manual.h"
 
 PG_MODULE_MAGIC;
 
@@ -33,9 +34,6 @@ static bool	check_drop_database(PlannedStmt *pstmt);
 
 /* Static variable */
 static char *ddd_list;
-
-/* Const. */
-#define MAX_DATABASE_NAME_LENGTH 63
 
 /* Module callback */
 void
@@ -73,7 +71,7 @@ _PG_fini(void)
 static bool
 check_drop_database_statement(DropdbStmt *dstmt)
 {
-	char buff[MAX_DATABASE_NAME_LENGTH + 1];
+	char buff[NAMEDATALEN];
 	int i, j;
 	char c;
 
@@ -89,7 +87,7 @@ check_drop_database_statement(DropdbStmt *dstmt)
 			|| c == '\f' || c == '\r')
 			continue;
 
-		if (c == ',' && j <= MAX_DATABASE_NAME_LENGTH)
+		if (c == ',' && j <= NAMEDATALEN - 1)
 		{
 			buff[j] = '\0';
 			if (pg_strcasecmp(dstmt->dbname, buff) == 0 
@@ -98,7 +96,7 @@ check_drop_database_statement(DropdbStmt *dstmt)
 			else
 				j = 0;
 		}
-		else if (j <= MAX_DATABASE_NAME_LENGTH)
+		else if (j <= NAMEDATALEN - 1)
 		{
 			buff[j++] = c;
 		}
@@ -113,7 +111,7 @@ check_drop_database_statement(DropdbStmt *dstmt)
 		}
 	}
 
-	if (MAX_DATABASE_NAME_LENGTH < j)
+	if (NAMEDATALEN - 1 < j)
 		return false;
 
 	buff[j] = '\0';
