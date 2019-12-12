@@ -18,11 +18,11 @@
 PG_MODULE_MAGIC;
 
 /* Saved hook values in case of unload */
-static ProcessUtility_hook_type	prev_ProcessUtility = NULL;
+static ProcessUtility_hook_type prev_ProcessUtility = NULL;
 
 /* Function declarations */
-void _PG_init(void);
-void _PG_fini(void);
+void		_PG_init(void);
+void		_PG_fini(void);
 
 /* Static function declarations */
 static void ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
@@ -30,7 +30,7 @@ static void ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
 							   QueryEnvironment *queryEnv, DestReceiver *dest,
 							   char *completionTag);
 static bool check_drop_database_statement(DropdbStmt *dstmt);
-static bool	check_drop_database(PlannedStmt *pstmt);
+static bool check_drop_database(PlannedStmt *pstmt);
 
 /* Static variable */
 static char *ddd_list;
@@ -71,9 +71,10 @@ _PG_fini(void)
 static bool
 check_drop_database_statement(DropdbStmt *dstmt)
 {
-	char buff[NAMEDATALEN];
-	int i, j;
-	char c;
+	char		buff[NAMEDATALEN];
+	int			i,
+				j;
+	char		c;
 
 	i = j = 0;
 	buff[0] = '\0';
@@ -90,7 +91,7 @@ check_drop_database_statement(DropdbStmt *dstmt)
 		if (c == ',' && j <= NAMEDATALEN - 1)
 		{
 			buff[j] = '\0';
-			if (pg_strcasecmp(dstmt->dbname, buff) == 0 
+			if (pg_strcasecmp(dstmt->dbname, buff) == 0
 				|| pg_strcasecmp(buff, "ALL") == 0)
 				return true;
 			else
@@ -102,10 +103,13 @@ check_drop_database_statement(DropdbStmt *dstmt)
 		}
 		else
 		{
-			/* Skip to the next entry because this dbname is invalid (too long). */
+			/*
+			 * Skip to the next entry because this dbname is invalid (too
+			 * long).
+			 */
 			j = 0;
 			buff[0] = '\0';
-			while (c != ',' && c != '\0' /* Skip to ',' or '\0'. */
+			while (c != ',' && c != '\0'	/* Skip to ',' or '\0'. */
 				   && (i < strlen(ddd_list) - 1))
 				c = ddd_list[++i];
 		}
@@ -129,26 +133,26 @@ check_drop_database(PlannedStmt *pstmt)
 {
 	switch (nodeTag(pstmt->utilityStmt))
 	{
-	case T_DropdbStmt:
-		return check_drop_database_statement((DropdbStmt *)pstmt->utilityStmt);
-		break;
-	default:
-		return false;
+		case T_DropdbStmt:
+			return check_drop_database_statement((DropdbStmt *) pstmt->utilityStmt);
+			break;
+		default:
+			return false;
 	}
 }
 
 /* ProcessUtility hook */
 static void
 ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
-					ProcessUtilityContext context, ParamListInfo params,
-					QueryEnvironment *queryEnv, DestReceiver *dest,
-					char *completionTag)
+				   ProcessUtilityContext context, ParamListInfo params,
+				   QueryEnvironment *queryEnv, DestReceiver *dest,
+				   char *completionTag)
 {
 	if (check_drop_database(pstmt))
 	{
 		ereport(ERROR,
 				(errmsg("%s cannot be dropped.",
-						(char *)((DropdbStmt *)pstmt->utilityStmt)->dbname)));
+						(char *) ((DropdbStmt *) pstmt->utilityStmt)->dbname)));
 		return;
 	}
 
