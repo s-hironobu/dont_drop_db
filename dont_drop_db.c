@@ -28,7 +28,11 @@ void		_PG_fini(void);
 static void ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
 							   ProcessUtilityContext context, ParamListInfo params,
 							   QueryEnvironment *queryEnv, DestReceiver *dest,
+#if PG_VERSION_NUM >= 130000
+							   QueryCompletion *qc);
+#else
 							   char *completionTag);
+#endif
 static bool check_drop_database_statement(DropdbStmt *dstmt);
 static bool check_drop_database(PlannedStmt *pstmt);
 
@@ -146,7 +150,11 @@ static void
 ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
 				   ProcessUtilityContext context, ParamListInfo params,
 				   QueryEnvironment *queryEnv, DestReceiver *dest,
+#if PG_VERSION_NUM >= 130000
+				   QueryCompletion *qc)
+#else
 				   char *completionTag)
+#endif
 {
 	if (check_drop_database(pstmt))
 	{
@@ -158,8 +166,16 @@ ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
 
 	if (prev_ProcessUtility)
 		prev_ProcessUtility(pstmt, queryString, context,
+#if PG_VERSION_NUM >= 130000
+							params, queryEnv, dest, qc);
+#else
 							params, queryEnv, dest, completionTag);
+#endif
 	else
 		standard_ProcessUtility(pstmt, queryString, context,
+#if PG_VERSION_NUM >= 130000
+								params, queryEnv, dest, qc);
+#else
 								params, queryEnv, dest, completionTag);
+#endif
 }
