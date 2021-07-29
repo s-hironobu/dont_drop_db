@@ -5,7 +5,7 @@
  * in the dont_drop_db.list parameter.
  *
  * Author: suzuki hironobu (hironobu@interdb.jp) 1, Dec, 2019
- * Copyright (C) 2019  suzuki hironobu
+ * Copyright (C) 2019-2021,  suzuki hironobu
  *-------------------------------------------------------------------------
  */
 #include "postgres.h"
@@ -26,6 +26,9 @@ void		_PG_fini(void);
 
 /* Static function declarations */
 static void ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
+#if PG_VERSION_NUM >= 140000
+								bool readOnlyTree,
+#endif
 							   ProcessUtilityContext context, ParamListInfo params,
 							   QueryEnvironment *queryEnv, DestReceiver *dest,
 #if PG_VERSION_NUM >= 130000
@@ -148,6 +151,9 @@ check_drop_database(PlannedStmt *pstmt)
 /* ProcessUtility hook */
 static void
 ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
+#if PG_VERSION_NUM >= 140000
+					bool readOnlyTree,
+#endif
 				   ProcessUtilityContext context, ParamListInfo params,
 				   QueryEnvironment *queryEnv, DestReceiver *dest,
 #if PG_VERSION_NUM >= 130000
@@ -165,14 +171,22 @@ ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
 	}
 
 	if (prev_ProcessUtility)
-		prev_ProcessUtility(pstmt, queryString, context,
+		prev_ProcessUtility(pstmt, queryString,
+#if PG_VERSION_NUM >= 140000
+							readOnlyTree,
+#endif
+							context,
 #if PG_VERSION_NUM >= 130000
 							params, queryEnv, dest, qc);
 #else
 							params, queryEnv, dest, completionTag);
 #endif
 	else
-		standard_ProcessUtility(pstmt, queryString, context,
+		standard_ProcessUtility(pstmt, queryString,
+#if PG_VERSION_NUM >= 140000
+								readOnlyTree,
+#endif
+								context,
 #if PG_VERSION_NUM >= 130000
 								params, queryEnv, dest, qc);
 #else

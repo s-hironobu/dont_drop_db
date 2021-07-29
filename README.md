@@ -16,12 +16,6 @@ Add the line shown below in your postgresql.conf.
 shared_preload_libraries = 'dont_drop_db'
 ```
 
-After starting your server, issue `CREATE EXTENSION` statement shown below.
-
-```
-postgres=# CREATE EXTENSION dont_drop_db;
-```
-
 ## Configuration Parameters
 
  - dont_drop_db.list : The list of databases that you want to prohibit to drop. The default is 'postgres,template0,template1'. If you set 'all', all databases cannot be dropped. Note that if you set only spaces such as " ", this extension does not prohibit to drop any database.
@@ -34,4 +28,5 @@ dont_drop_db.list = ' ' # not prohibit to drop any database
 ```
 
 ## Change Log
- - 1st Dec 2019: Version 1.0 Released.
+- 29th Aug 2021: Supported Version 14.
+- 1st Dec 2019: Version 1.0 Released.
