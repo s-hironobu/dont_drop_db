@@ -27,7 +27,7 @@ void		_PG_fini(void);
 /* Static function declarations */
 static void ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
 #if PG_VERSION_NUM >= 140000
-								bool readOnlyTree,
+							   bool readOnlyTree,
 #endif
 							   ProcessUtilityContext context, ParamListInfo params,
 							   QueryEnvironment *queryEnv, DestReceiver *dest,
@@ -150,16 +150,16 @@ check_drop_database(PlannedStmt *pstmt)
 
 /* ProcessUtility hook */
 static void
-ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
+			ddd_ProcessUtility(PlannedStmt *pstmt, const char *queryString,
 #if PG_VERSION_NUM >= 140000
-					bool readOnlyTree,
+							   bool readOnlyTree,
 #endif
-				   ProcessUtilityContext context, ParamListInfo params,
-				   QueryEnvironment *queryEnv, DestReceiver *dest,
+							   ProcessUtilityContext context, ParamListInfo params,
+							   QueryEnvironment *queryEnv, DestReceiver *dest,
 #if PG_VERSION_NUM >= 130000
-				   QueryCompletion *qc)
+							   QueryCompletion *qc)
 #else
-				   char *completionTag)
+							   char *completionTag)
 #endif
 {
 	if (check_drop_database(pstmt))
