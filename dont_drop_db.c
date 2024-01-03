@@ -5,7 +5,7 @@
  * in the dont_drop_db.list parameter.
  *
  * Author: suzuki hironobu (hironobu@interdb.jp) 1, Dec, 2019
- * Copyright (C) 2019-2023,  suzuki hironobu
+ * Copyright (C) 2019-2024,  suzuki hironobu
  *-------------------------------------------------------------------------
  */
 #include "postgres.h"
