@@ -28,6 +28,7 @@ dont_drop_db.list = ' ' # not prohibit to drop any database
 ```
 
 ## Change Log
+- 12th Sep 2024: Checked supporting Version 17rc1.
 - 14th Sep 2023: Checked supporting Version 16.
 - 31st Dec 2022: Checked supporting Version 15.
 - 29th Aug 2021: Supported Version 14.
